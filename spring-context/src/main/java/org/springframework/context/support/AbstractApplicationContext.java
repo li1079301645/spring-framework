@@ -535,6 +535,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			// Tell the subclass to refresh the internal bean factory.
 			// 刷新BeanFactory(委派模式), 获取BeanFactory
+			// 核心方法refreshBeanFactory:
+			// 若之前已有BeanFactory, 则销毁所有的单例Bean并关闭BeanFactory
+			// 创建并配置BeanFactory
+			// loadBeanDefinitions方法:
+			// 初始化XML阅读器，然后读取配置文件(configLocation/Resource)得到Document对象，
+			// 然后在DefaultBeanDefinitionDocumentReader中的doRegisterBeanDefinitions方法中，
+			// 对Document元素进行解析，生成BeanDefinition,然后调用registry.registerBeanDefinition
+			// 注册(以Map的方式存储)
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
