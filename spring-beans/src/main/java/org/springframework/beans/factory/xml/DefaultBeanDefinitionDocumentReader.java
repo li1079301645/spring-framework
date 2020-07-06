@@ -93,6 +93,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	@Override
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
 		this.readerContext = readerContext;
+		// 从文档的根节点注册Bean定义，内部使用递归
 		doRegisterBeanDefinitions(doc.getDocumentElement());
 	}
 
@@ -146,6 +147,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 
 		preProcessXml(root);
+		// 解析Bean
 		parseBeanDefinitions(root, this.delegate);
 		postProcessXml(root);
 
@@ -173,15 +175,19 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				if (node instanceof Element) {
 					Element ele = (Element) node;
 					if (delegate.isDefaultNamespace(ele)) {
+						// 解析默认元素 "import", "alias", "bean", "beans"
+						// 如果是beans元素 则回到doRegisterBeanDefinitions方法进行递归
 						parseDefaultElement(ele, delegate);
 					}
 					else {
+						// 解析自定义元素
 						delegate.parseCustomElement(ele);
 					}
 				}
 			}
 		}
 		else {
+			// 解析自定义元素
 			delegate.parseCustomElement(root);
 		}
 	}
