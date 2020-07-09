@@ -75,12 +75,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 
 	/** Cache of singleton objects: bean name to bean instance. */
+	// 保存初始化完成的单例Bean实例
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/** Cache of singleton factories: bean name to ObjectFactory. */
+	// 保存单例Bean的工厂函数对象
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name to bean instance. */
+	// 保存提前曝光的单例Bean实例
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 	/** Set of registered singletons, containing the bean names in registration order. */
@@ -178,15 +181,24 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		/* 解决了循环依赖的问题 */
+		// 先在初始化完成的Bean集合中找
 		Object singletonObject = this.singletonObjects.get(beanName);
+		// 未找到 && 处于正在创建状态
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
+				// 从提前曝光的Bean集合中找
 				singletonObject = this.earlySingletonObjects.get(beanName);
+				// 未找到 && 允许提前曝光
 				if (singletonObject == null && allowEarlyReference) {
+					// 查找Bean对应的工厂函数对象
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
+						// 获取实例
 						singletonObject = singletonFactory.getObject();
+						// 记录到提前曝光的单例Bean集合中
 						this.earlySingletonObjects.put(beanName, singletonObject);
+						// 从Bean工厂函数对象集合中移除
 						this.singletonFactories.remove(beanName);
 					}
 				}
