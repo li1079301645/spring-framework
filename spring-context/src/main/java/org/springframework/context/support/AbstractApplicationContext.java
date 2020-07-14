@@ -586,6 +586,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
+				// 清除资源缓存
+				// 初始化lifecycleProcessor
+				// 调用lifecycleProcessor#onRefresh()
+				// 发布ContextRefreshedEvent
+				// 注册MBeanServer
 				finishRefresh();
 			}
 
@@ -596,9 +601,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				}
 
 				// Destroy already created singletons to avoid dangling resources.
+				// 销毁所有的单例Bean
 				destroyBeans();
 
 				// Reset 'active' flag.
+				// 取消刷新
+				// 重置active标记
 				cancelRefresh(ex);
 
 				// Propagate exception to caller.
@@ -608,6 +616,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			finally {
 				// Reset common introspection caches in Spring's core, since we
 				// might not ever need metadata for singleton beans anymore...
+				// 清除缓存
 				resetCommonCaches();
 			}
 		}
